@@ -54,14 +54,14 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
-          title: remove 'draft: true'
+          title: "remove 'draft: true'"
           branch: "$BRANCH"
           commit-message: |
-            remove 'draft: true'
+            "remove 'draft: true'"
           labels: |
             skip-push
           body: |
-            'draft: true'を削除しました。
+            "'draft: true'を削除しました。"
           delete-branch: true
 
       - name: Enable Pull Request Automerge
