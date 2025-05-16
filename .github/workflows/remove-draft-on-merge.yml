@@ -1,4 +1,4 @@
-name: Remove 'draft: true' from changed files
+name: "Remove 'draft: true' from changed files"
 
 on:
   pull_request:
