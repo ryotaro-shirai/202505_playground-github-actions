@@ -32,7 +32,8 @@ jobs:
           gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path' > changed_files.txt
           cat changed_files.txt
 
-      - name: "Remove 'draft: true' from changed files"
+      - name: |
+          Remove 'draft: true' from changed files
         run: |
           while read file; do
             if [ -f "$file" ] && grep -q 'draft: true' "$file"; then
@@ -45,14 +46,15 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
-          title: "remove 'draft: true'"
+          title: |
+            remove 'draft: true'
           branch: remove-draft
           commit-message: |
-            "remove 'draft: true'"
+            remove 'draft: true'
           labels: |
             skip-push
           body: |
-            "'draft: true'を削除しました。"
+            ${{ github.event.pull_request.id }}がマージされたので、`draft: true`を自動削除し、記事を公開しました。
           delete-branch: true
 
       - name: Enable Pull Request Automerge
