@@ -3,9 +3,7 @@ name: "Hello World after remove draft"
 on:
   workflow_run:
     workflows:
-      - remove-draft
-    branches:
-      - main
+      - "Remove 'draft: true' from changed files"
     types:
       - completed
 
