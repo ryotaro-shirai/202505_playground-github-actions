@@ -41,6 +41,7 @@ jobs:
               sed -i '/draft: true/d' "$file"
             fi
           done < changed_files.txt
+          rm changed_files.txt
 
       - name: create pull request
         id: cpr
