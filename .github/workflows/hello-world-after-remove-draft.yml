@@ -1,0 +1,16 @@
+name: "Hello World after remove draft"
+
+on:
+  workflow_run:
+    workflows:
+      - remove-draft
+    branches:
+      - main
+    types:
+      - completed
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Hello World!"
