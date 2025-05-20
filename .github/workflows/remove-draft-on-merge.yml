@@ -55,7 +55,7 @@ jobs:
           labels: |
             skip-push
           body: |
-            『${{ github.event.pull_request.title }}』がマージされたので、`draft: true`を自動削除し、記事を公開しました。
+            『${{ github.event.pull_request.title }}（#${{ github.event.pull_request.number }}）』がマージされたので、`draft: true`を自動削除し、記事を公開しました。
           delete-branch: true
 
       - name: Enable Pull Request Automerge
