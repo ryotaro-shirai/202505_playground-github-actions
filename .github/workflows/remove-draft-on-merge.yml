@@ -12,6 +12,7 @@ jobs:
   remove-draft:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    name: remove-draft
 
     steps:
       - name: Checkout base branch
