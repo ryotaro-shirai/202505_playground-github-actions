@@ -6,7 +6,7 @@ on:
       - main
     types: [closed]
     paths:
-      - "draft/**"
+      - "draft/**.md"
 
 jobs:
   remove-draft:
@@ -37,13 +37,13 @@ jobs:
         run: |
           while read file; do
             if [ -f "$file" ] && grep -q 'draft: true' "$file"; then
-              echo "Cleaning $file"
+              echo "Remove 'draft: true' from $file"
               sed -i '/draft: true/d' "$file"
             fi
           done < changed_files.txt
           rm changed_files.txt
 
-      - name: create pull request
+      - name: Create pull request
         id: cpr
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
@@ -55,7 +55,7 @@ jobs:
           labels: |
             skip-push
           body: |
-            ${{ github.event.pull_request.id }}がマージされたので、`draft: true`を自動削除し、記事を公開しました。
+            『${{ github.event.pull_request.title }}』がマージされたので、`draft: true`を自動削除し、記事を公開しました。
           delete-branch: true
 
       - name: Enable Pull Request Automerge
