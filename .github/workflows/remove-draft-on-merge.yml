@@ -52,6 +52,8 @@ jobs:
           branch: remove-draft
           commit-message: |
             remove 'draft: true'
+          labels: |
+            remove-draft
           body: |
             『${{ github.event.pull_request.title }}（#${{ github.event.pull_request.number }}）』がマージされたので、`draft: true`を自動削除し、記事を公開しました。
           delete-branch: true
