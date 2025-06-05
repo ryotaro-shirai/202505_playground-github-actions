@@ -9,12 +9,9 @@ on:
 
 jobs:
   hello:
-    if: |
-      github.event.pull_request.merged == true
-      && contains(github.event.pull_request.labels.*.name, 'remove-draft')
     runs-on: ubuntu-latest
     steps:
       - run: |
           echo "Merged: ${{ github.event.pull_request.merged }}"
-          echo "Skip Push: ${{ contains(github.event.pull_request.labels.*.name, 'remove-draft') }}"
+          echo "remove-draft: ${{ contains(github.event.pull_request.labels.*.name, 'remove-draft') }}"
           echo "Hello World!"
