@@ -12,6 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo {{github.event.pull_request.merged}}
-          echo {{!contains(github.event.pull_request.labels.*.name, 'skip-push')}}
+          echo "Merged: ${{ github.event.pull_request.merged }}"
+          echo "Skip Push: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-push') }}"
           echo "Hello World!"
