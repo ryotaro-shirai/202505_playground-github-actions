@@ -9,12 +9,9 @@ on:
 
 jobs:
   hello:
-    if: |
-      github.event.pull_request.merged == true
-      && !contains(github.event.pull_request.labels.*.name, 'skip-push')
     runs-on: ubuntu-latest
     steps:
       - run: |
-        echo {{github.event.pull_request.merged}}
-        echo {{!contains(github.event.pull_request.labels.*.name, 'skip-push')}}
-        echo "Hello World!"
+          echo {{github.event.pull_request.merged}}
+          echo {{!contains(github.event.pull_request.labels.*.name, 'skip-push')}}
+          echo "Hello World!"
