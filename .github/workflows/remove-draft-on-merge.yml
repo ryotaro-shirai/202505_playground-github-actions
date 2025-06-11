@@ -1,31 +1,16 @@
 name: "Remove 'draft: true' from changed files"
 
 on:
-  pull_request:
-    branches:
-      - main
-    types: [closed]
-    paths:
-      - "draft/**.md"
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   remove-draft:
     if: |
-      github.event.pull_request.merged == true
-      && !contains(github.event.pull_request.labels.*.name, 'remove-draft')
+      github.event.review.state == 'approved'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout base branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.ref }}
-
-      - name: Set up Git
-        run: |
-          git config user.name "github-actions"
-          git config user.email "action@github.com"
-
       - name: Get changed files from PR
         id: changed_files
         env:
@@ -46,23 +31,10 @@ jobs:
           rm changed_files.txt
 
       - name: Create pull request
-        id: cpr
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
-        with:
-          title: |
-            remove 'draft: true'
-          branch: remove-draft
-          commit-message: |
-            remove 'draft: true'
-          labels: |
-            remove-draft
-          body: |
-            『${{ github.event.pull_request.title }}（#${{ github.event.pull_request.number }}）』がマージされたので、`draft: true`を自動削除し、記事を公開しました。
-          delete-branch: true
-
-      - name: Enable Pull Request Automerge
-        if: steps.cpr.outputs.pull-request-operation == 'created'
-        uses: peter-evans/enable-pull-request-automerge@a660677d5469627102a1c1e11409dd063606628d # v3.0.0
-        with:
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-          merge-method: squash
+        uses: actions/checkout@v4
+        run: |
+          git config user.name "github-actions"
+          git config user.email "action@github.com"
+          git add .
+          git commit -m "approveされたのでDraft: trueを削除しました"
+          git push
