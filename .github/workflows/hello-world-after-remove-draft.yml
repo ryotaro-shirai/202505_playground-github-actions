@@ -11,7 +11,6 @@ jobs:
     if: |
       github.event.pull_request.merged == true
       && !contains(github.event.pull_request.labels.*.name, 'skip-push') # 追加: 呼び出すワークフローの条件を満たすため
-      && contains(github.event.pull_request.labels.*.name, 'remove-draft')
     runs-on: ubuntu-latest
     steps:
       - run: |
