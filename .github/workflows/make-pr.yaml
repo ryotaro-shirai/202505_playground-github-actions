@@ -1,0 +1,77 @@
+# ワークフローの名前を定義します。
+name: 自動PR作成ワークフロー
+
+# ワークフローがいつ実行されるかを定義します。
+on:
+  # 手動でワークフローを実行できるようにします。
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'PRのコミットメッセージとタイトルに含める追加メッセージ (オプション)'
+        required: false
+        default: ''
+
+# ワークフローがGitHubリポジトリのコンテンツとプルリクエストに対して書き込み権限を持つように設定します。
+permissions:
+  contents: write # コミットをプッシュするために必要
+  pull-requests: write # プルリクエストを作成するために必要
+
+# ワークフローのジョブを定義します。
+jobs:
+  create-pr:
+    # このジョブがUbuntuの最新バージョンで実行されるように設定します。
+    runs-on: ubuntu-latest
+    steps:
+      # リポジトリのコードをワークフロー実行環境にチェックアウトします。
+      - name: コードをチェックアウト
+        uses: actions/checkout@v4
+
+      # タイムスタンプ付きのファイルを作成し、その情報（タイムスタンプとファイル名）を後続のステップで使えるように出力します。
+      - name: タイムスタンプ付きファイルを作成
+        id: generate_file_info # このステップの出力にアクセスするためのID
+        run: |
+          # 現在のUTCタイムスタンプを 'YYYYMMDDHHmm' 形式で取得します。
+          TIMESTAMP=$(date -u +'%Y%m%d%H%M')
+          # 作成するファイルのパスと名前を定義します。
+          FILENAME="draft/${TIMESTAMP}.yml"
+
+          # 'draft' ディレクトリが存在しない場合は作成します。
+          mkdir -p draft
+
+          # ファイルにコンテンツを書き込みます。
+          echo "workflow-execution-time: ${TIMESTAMP}" > "${FILENAME}"
+          echo "自動生成されたファイルです。" >> "${FILENAME}"
+
+          # タイムスタンプとファイル名をGitHub Actionsの出力変数として設定します。
+          # これにより、後続のステップで `${{ steps.generate_file_info.outputs.timestamp }}` や `${{ steps.generate_file_info.outputs.filename }}` として参照できます。
+          echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
+          echo "filename=${FILENAME}" >> $GITHUB_OUTPUT
+          echo "ファイル '${FILENAME}' が作成されました。"
+
+      # 'peter-evans/create-pull-request' アクションを使用してプルリクエストを作成します。
+      - name: PRを作成
+        uses: peter-evans/create-pull-request@v6
+        with:
+          # GitHubトークンを使用して認証を行います。このトークンはGitHub Actionsによって自動的に提供されます。
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # コミットメッセージを定義します。
+          commit-message: "feat: 新しいタイムスタンプ付きファイルを追加 ${{ steps.generate_file_info.outputs.filename }} ${{ github.event.inputs.message }}"
+          # プルリクエストのタイトルを定義します。
+          title: "自動PR: ワークフロー実行時刻 ${{ steps.generate_file_info.outputs.timestamp }} ${{ github.event.inputs.message }}"
+          # プルリクエストの本文を定義します。
+          body: |
+            このプルリクエストは、ワークフローが実行された際に自動的に作成された、タイムスタンプ付きのファイルを`draft`フォルダに追加します。
+
+            **ファイル名**: `${{ steps.generate_file_info.outputs.filename }}`
+            **ワークフロー実行ID**: `${{ github.run_id }}`
+
+            ${{ github.event.inputs.message }}
+          # 新しい変更をプッシュするブランチの名前を定義します。
+          branch: "feature/add-timestamp-file-${{ github.run_id }}"
+          # プルリクエストのターゲットとなるベースブランチを定義します。通常は 'main' や 'develop' です。
+          base: "main"
+          # PRがマージされた後、自動的に作成されたブランチを削除するかどうかを設定します。
+          delete-branch: true
+          # 変更がない場合にPRを作成しないようにします。
+          committer: GitHub Actions <actions@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
