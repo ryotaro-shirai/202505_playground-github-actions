@@ -1,4 +1,4 @@
-name: "Remove 'draft: true' from changed files"
+name: "Remove 'draft: true' from changed files when PR is approved"
 
 on:
   pull_request_review:
@@ -14,9 +14,7 @@ jobs:
       - name: Checkout PR head branch
         uses: actions/checkout@v4
         with:
-          # プルリクエストのソースブランチをチェックアウトします。
           ref: ${{ github.event.pull_request.head.ref }}
-          # PRに関連するすべてのコミット履歴を取得します。
           fetch-depth: 0
 
       - name: Get changed files from PR
@@ -31,26 +29,23 @@ jobs:
           Remove 'draft: true' from changed files
         run: |
           while read file; do
-            if [ -f "$file" ] && grep -q 'draft: true' "$file"; then
+            if [ -f "$file" ] && [[ "$file" == *.md ]] && grep -q '^Draft: true$' "$file"; then
               echo "Remove 'draft: true' from $file"
-              sed -i '/draft: true/d' "$file"
+              sed -i '/^draft: true$/d' "$file"
             fi
           done < changed_files.txt
           rm changed_files.txt
 
-      - name: Create pull request
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "action@github.com"
-          # 変更がステージングエリアにあるか確認します。
           if git diff --exit-code --quiet; then
             echo "変更がありません。コミットとプッシュはスキップします。"
           else
             # 変更されたファイルをステージングします。
             git add .
-            # コミットメッセージを指定して変更をコミットします。
             git commit -m "feat: PRが承認されたため、'draft: true' を削除しました"
-            # 変更を元のブランチにプッシュします。
             git push origin HEAD
             echo "変更がコミットされ、プッシュされました。"
           fi
