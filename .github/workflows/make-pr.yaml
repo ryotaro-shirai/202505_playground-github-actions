@@ -40,6 +40,7 @@ jobs:
 
           # ファイルにコンテンツを書き込みます。
           echo "workflow-execution-time: ${TIMESTAMP}" > "${FILENAME}"
+          echo "draft: true" >> "${FILENAME}"
           echo "自動生成されたファイルです。" >> "${FILENAME}"
 
           # タイムスタンプとファイル名をGitHub Actionsの出力変数として設定します。
