@@ -30,8 +30,8 @@ jobs:
         run: |
           while read file; do
             if [ -f "$file" ] && [[ "$file" == *.md ]] && grep -q '^Draft: true$' "$file"; then
-              echo "Remove 'draft: true' from $file"
-              sed -i '/^draft: true$/d' "$file"
+              echo "Remove 'Draft: true' from $file"
+              sed -i '/^Draft: true$/d' "$file"
             fi
           done < changed_files.txt
           rm changed_files.txt
